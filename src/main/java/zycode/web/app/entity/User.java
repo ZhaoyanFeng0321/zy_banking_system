@@ -1,5 +1,6 @@
 package zycode.web.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -48,6 +49,7 @@ public class User implements UserDetails {
     private List<String> roles;
 
     @OneToOne(mappedBy = "owner")
+    @JsonIgnore
     private Card card;
 
     /*
@@ -63,9 +65,11 @@ public class User implements UserDetails {
         - This improves performance by preventing unnecessary data retrieval.
      */
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Transaction> transactions;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Account> accounts;
 
     @Override

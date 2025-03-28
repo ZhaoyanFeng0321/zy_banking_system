@@ -1,5 +1,6 @@
 package zycode.web.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,11 +23,12 @@ public class Account {
     private String accountId;
     private double balance;
     @Column(unique = true, nullable = false)
-    private long accountName;
-    private String accountNumber;
+    private long accountNumber;
+    private String accountName;
     private String currency;
-    private String symbol;
-    private char code;
+
+    private char symbol;
+    private String code;
     private String label;
 
     @CreationTimestamp
@@ -34,11 +36,17 @@ public class Account {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    /**
+     * User who owns the account.
+     * This field is annotated with {@link JsonIgnore} to prevent infinite recursion during JSON serialization.
+     */
     @ManyToOne
     @JoinColumn(name = "owner_id")
+    @JsonIgnore
     private User owner;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Transaction> transactions;
 
 }

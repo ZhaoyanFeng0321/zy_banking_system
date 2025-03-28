@@ -24,7 +24,7 @@ public class UserController {
         var token = (String) authObject.get("token");
         return ResponseEntity.ok()
                 .header("Authorization", token)
-                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Authentication")
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization")
                 .body(authObject.get("user"));
     }
 }
