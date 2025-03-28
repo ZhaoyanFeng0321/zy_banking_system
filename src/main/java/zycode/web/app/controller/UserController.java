@@ -3,10 +3,7 @@ package zycode.web.app.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import zycode.web.app.dto.UserDto;
 import zycode.web.app.entity.User;
 import zycode.web.app.service.UserService;
@@ -17,15 +14,17 @@ import zycode.web.app.service.UserService;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/user")
+    @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody UserDto userDto) {
         return ResponseEntity.ok(userService.registerUser(userDto));
     }
-
+    @PostMapping("/auth")
     public ResponseEntity<?> authenticateUser(@RequestBody UserDto userDto) {
         var authObject = userService.authenticateUser(userDto);
+        var token = (String) authObject.get("token");
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, (String) authObject.get("token"))
+                .header("Authorization", token)
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Authentication")
                 .body(authObject.get("user"));
     }
 }
