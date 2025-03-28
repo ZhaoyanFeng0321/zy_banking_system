@@ -50,7 +50,7 @@ public class AppConfig {
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        var daoProvider = new DaoAuthenticationProvider((passwordEncoder()));
+        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider((passwordEncoder()));
         daoProvider.setUserDetailsService(userDetailsService());
         return daoProvider;
     }
