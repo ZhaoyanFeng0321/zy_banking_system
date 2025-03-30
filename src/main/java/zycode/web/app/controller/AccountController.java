@@ -38,10 +38,21 @@ public class AccountController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<List<Account>> getUserAccounts(Authentication authentication) {
         var user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(accountService.getUserAccounts(user.getUid()));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getUserAccountById(@RequestParam String accountId, Authentication authentication) {
+        var user = (User) authentication.getPrincipal();
+        try {
+            return ResponseEntity.ok(accountService.getAccountById(accountId, user.getUid()));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Something went wrong." + e.getMessage());
+        }
     }
 
     /**

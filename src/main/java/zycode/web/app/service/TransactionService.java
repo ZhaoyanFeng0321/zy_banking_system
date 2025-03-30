@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import zycode.web.app.entity.*;
 import zycode.web.app.repository.TransactionRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -48,4 +50,7 @@ public class TransactionService {
         return  transactionRepository.save(transaction);
     }
 
+    public List<Transaction> getUserTransactions(String uid) {
+        return transactionRepository.findByUid(uid);
+    }
 }

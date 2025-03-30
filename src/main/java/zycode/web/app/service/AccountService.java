@@ -29,6 +29,13 @@ public class AccountService {
         return accountRepository.findAllByOwnerUid(uid);
     }
 
+    public Account getAccountById(String accountId, String uid) throws Exception {
+        if (!accountRepository.existsByAccountIdAndOwnerUid(accountId, uid)){
+            throw new IllegalAccessException("Access forbidden");
+        }
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new Exception("Account not found"));
+    }
 
     public Transaction transferFunds(TransferDto transferDto, User user) throws Exception {
         var senderAccount = accountRepository.findByCodeAndOwnerUid(transferDto.getCode(), user.getUid())
