@@ -25,7 +25,9 @@ public class Transaction {
     private String description;
     private String sender;
     private String receiver;
+    @Enumerated(EnumType.STRING)
     private Status status;
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     @CreationTimestamp

@@ -13,5 +13,4 @@ public class TransferDto {
     private long recipientAccountNumber;
     private double amount;
     private String code;
-    private String receiver;
 }

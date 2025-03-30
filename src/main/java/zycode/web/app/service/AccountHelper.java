@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import zycode.web.app.dto.AccountDto;
-import zycode.web.app.dto.TransferDto;
 import zycode.web.app.entity.*;
 import zycode.web.app.repository.AccountRepository;
 import zycode.web.app.repository.CardRepository;
@@ -62,7 +61,7 @@ public class AccountHelper {
     public Transaction performTransfer(Account senderAccount, Account receiverAccount, double amount, User user) throws Exception {
         validateSufficientFunds(senderAccount, amount);
         senderAccount.setBalance(senderAccount.getBalance() - amount);
-        receiverAccount.setBalance(senderAccount.getBalance() + amount);
+        receiverAccount.setBalance(receiverAccount.getBalance() + amount);
         // update account balance
         accountRepository.saveAll(List.of(senderAccount, receiverAccount));
         // create transaction record for sender and receiver
@@ -72,9 +71,11 @@ public class AccountHelper {
         return senderTransaction;
     }
 
-    public Transaction payCardBalance(Account senderAccount, Card card, double amount, User user) throws Exception {
-        validateSufficientFunds(senderAccount, amount);
+    public Transaction payCardBalance(Account senderAccount, double amount, User user) throws Exception {
+        var card = cardRepository.findByOwnerUid(user.getUid())
+                .orElseThrow(() -> new UnsupportedOperationException("User does not have card"));
 
+        validateSufficientFunds(senderAccount, amount);
         senderAccount.setBalance(senderAccount.getBalance() - amount);
         card.setBalance(card.getBalance() + amount);
         cardRepository.save(card);

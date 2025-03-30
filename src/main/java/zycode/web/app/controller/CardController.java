@@ -34,10 +34,10 @@ public class CardController {
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<?> makePayment(@RequestBody TransferDto dto, Authentication authentication) {
+    public ResponseEntity<?> makePayment(@RequestParam String destinationAccount, @RequestBody TransferDto dto, Authentication authentication) {
         var user = (User) authentication.getPrincipal();
         try {
-            return ResponseEntity.ok(cardService.makePayment(dto, user));
+            return ResponseEntity.ok(cardService.makePayment(destinationAccount, dto.getAmount(), user));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong." + e.getMessage());
         }

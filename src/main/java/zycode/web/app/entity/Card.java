@@ -24,6 +24,7 @@ public class Card {
     @Column(nullable = false, unique = true)
     private long cardNumber;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Type type;
     private String cardHolder;
     private double balance;

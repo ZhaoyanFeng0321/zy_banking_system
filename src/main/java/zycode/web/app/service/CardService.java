@@ -2,10 +2,9 @@ package zycode.web.app.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zycode.web.app.dto.CardDto;
-import zycode.web.app.dto.TransferDto;
 import zycode.web.app.entity.*;
-import zycode.web.app.repository.AccountRepository;
 import zycode.web.app.repository.CardRepository;
 import zycode.web.app.util.RandomUtil;
 
@@ -14,11 +13,10 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CardService {
     private final CardRepository cardRepository;
     private final TransactionService transactionService;
-
-
 
     public Card getCard(String uid) {
         return cardRepository.findByOwnerUid(uid).orElseThrow();
@@ -48,13 +46,21 @@ public class CardService {
     }
 
 
-    public Transaction makePayment(TransferDto dto, User user) throws Exception {
+    public Transaction makePayment(String destinationAccount, double amount, User user) throws Exception {
+        if (amount <= 0) throw new UnsupportedOperationException("Payment is not supported. Invalid amount.");
+
         var card = cardRepository.findByOwnerUid(user.getUid())
-                .orElseThrow(() -> new UnsupportedOperationException("User does not have card"));
-        if(dto.getAmount() <= 0) throw new UnsupportedOperationException("Invalid amount to transfer");
-        card.setBalance(card.getBalance() - dto.getAmount());
+                .orElseThrow(() -> new UnsupportedOperationException("User does not have a card"));
+        exceedCreditLimit(card, amount);
+        card.setBalance(card.getBalance() + amount);
         cardRepository.save(card);
         return transactionService
-                .makeCardPayment(dto.getAmount(),0, user, card, dto.getReceiver());
+                .makeCardPayment(amount,0, user, card, destinationAccount);
+    }
+
+    private void exceedCreditLimit(Card card, double amount) throws Exception {
+        if (card.getBalance() + amount > card.getCreditLine()) {
+            throw new UnsupportedOperationException("Payment not allowed. Credit limit exceeded.");
+        }
     }
 }
