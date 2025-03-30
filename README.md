@@ -1,0 +1,51 @@
+# **ZyBank - A Modern Banking Application**  
+This is a secure and feature-rich online banking system. This project implements core banking functionalities such as account management, transactions, and authentication.
+
+## **Features**  
+✅ User Registration & Authentication  
+✅ Account Creation & Management  
+✅ Deposit & Withdrawal Transactions  
+✅ Fund Transfers Between Accounts  
+✅ Transaction History  
+✅ RESTful API with Spring Boot  
+✅ Database Integration with PostgreSQL  
+
+## **Tech Stack**  
+- **Backend:** Java, Spring Boot, Spring Security, JPA (Hibernate)  
+- **Database:** PostgreSQL  
+- **API Testing:** Postman  
+- **Version Control:** Git & GitHub  
+
+## **Installation & Setup**  
+### **1️⃣ Clone the Repository**  
+```sh
+git clone https://github.com/yourusername/zybank.git
+cd zybank
+```
+
+### **2️⃣ Configure Database**  
+Update `application.properties` (or `application.yml`) with your PostgreSQL credentials:  
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/zybank
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+```
+
+### **3️⃣ Build & Run the Application**  
+```sh
+./mvnw spring-boot:run
+```
+
+### **4️⃣ API Endpoints**  
+- **Register User:** `POST /api/v1/user/register`  
+- **Login:** `POST /api/v1/user/login`  
+- **Create Account:** `POST /api/v1/accounts`  
+- **Check Balance:** `GET /api/v1/accounts/{accountId}/balance`  
+- **Transfer Funds:** `POST /api/v1/accounts/transfer`  
+- **View Transactions:** `GET /api/v1/accounts/{accountId}/transactions`  
+
+## **To-Do & Improvements**  
+🔹 Adding Redis for JWT token refresh and expiration   
+🔹 Implement Role-Based Access Control  
+🔹 Adding security to sensitive information(card#, cvv, pin...)
+...
