@@ -23,8 +23,11 @@ public class Card {
 
     @Column(nullable = false, unique = true)
     private long cardNumber;
+    @Column(nullable = false)
+    private Type type;
     private String cardHolder;
-    private Double balance;
+    private double balance;
+    private double creditLine;
     private String billingAddress;
     private String cvv;
     private String pin;

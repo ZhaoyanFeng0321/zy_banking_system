@@ -6,11 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import zycode.web.app.dto.AccountDto;
-import zycode.web.app.entity.Account;
-import zycode.web.app.entity.Transaction;
-import zycode.web.app.entity.Type;
-import zycode.web.app.entity.User;
+import zycode.web.app.dto.TransferDto;
+import zycode.web.app.entity.*;
 import zycode.web.app.repository.AccountRepository;
+import zycode.web.app.repository.CardRepository;
 import zycode.web.app.util.RandomUtil;
 
 import javax.naming.OperationNotSupportedException;
@@ -24,6 +23,8 @@ public class AccountHelper {
     private final Logger logger = LoggerFactory.getLogger(AccountHelper.class);
     private final AccountRepository accountRepository;
     private final TransactionService transactionService;
+    private final CardRepository cardRepository;
+
 
     private final Map<String, String> CURRENCIES = Map.of(
             "USD", "United States Dollar",
@@ -58,6 +59,29 @@ public class AccountHelper {
         return accountRepository.save(account);
     }
 
+    public Transaction performTransfer(Account senderAccount, Account receiverAccount, double amount, User user) throws Exception {
+        validateSufficientFunds(senderAccount, amount);
+        senderAccount.setBalance(senderAccount.getBalance() - amount);
+        receiverAccount.setBalance(senderAccount.getBalance() + amount);
+        // update account balance
+        accountRepository.saveAll(List.of(senderAccount, receiverAccount));
+        // create transaction record for sender and receiver
+        var senderTransaction = transactionService.createAccountTransaction(amount, Type.WITHDRAW, 0, user, senderAccount);
+        var receiverTransaction = transactionService.createAccountTransaction(amount, Type.DEPOSIT, 0, receiverAccount.getOwner(), receiverAccount);
+
+        return senderTransaction;
+    }
+
+    public Transaction payCardBalance(Account senderAccount, Card card, double amount, User user) throws Exception {
+        validateSufficientFunds(senderAccount, amount);
+
+        senderAccount.setBalance(senderAccount.getBalance() - amount);
+        card.setBalance(card.getBalance() + amount);
+        cardRepository.save(card);
+        accountRepository.save(senderAccount);
+        return transactionService.payCardBalance(amount, 0, user, card, senderAccount);
+    }
+
     /**
      * Validates that an account of the given currency type does not already exist for the specified user.
      *
@@ -71,21 +95,10 @@ public class AccountHelper {
         }
     }
 
-    public Transaction performTransfer(Account senderAccount, Account receiverAccount, double amount, User user) throws Exception {
-        validateSufficientFunds(senderAccount, amount);
-        senderAccount.setBalance(senderAccount.getBalance() - amount);
-        receiverAccount.setBalance(senderAccount.getBalance() + amount);
-        // update account balance
-        accountRepository.saveAll(List.of(senderAccount, receiverAccount));
-        // create transaction record for sender and receiver
-        var senderTransaction = transactionService.createAccountTransaction(amount, Type.WITHDRAW, 0, user, senderAccount);
-        var receiverTransaction = transactionService.createAccountTransaction(amount, Type.DEPOSIT, 0, receiverAccount.getOwner(), receiverAccount);
-
-        return senderTransaction;
-
-    }
-
     public void validateSufficientFunds(Account account, double amount) throws Exception {
+        if (amount <= 0) {
+            throw new OperationNotSupportedException("Invalid amount to transfer");
+        }
         if(account.getBalance() < amount) {
             throw new OperationNotSupportedException("Insufficient funds in the account");
         }

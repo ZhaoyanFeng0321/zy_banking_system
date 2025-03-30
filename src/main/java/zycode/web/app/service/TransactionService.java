@@ -22,4 +22,30 @@ public class TransactionService {
         return  transactionRepository.save(transaction);
     }
 
+    public Transaction makeCardPayment(double amount, double txFee, User user, Card card, String receiverAccount) {
+        var transaction = Transaction.builder()
+                .amount(amount)
+                .type(card.getType())
+                .status(Status.COMPLETED)
+                .txFee(txFee)
+                .owner(user)
+                .card(card)
+                .receiver(receiverAccount)
+                .build();
+        return transactionRepository.save(transaction);
+    }
+
+    public Transaction payCardBalance(double amount, double txFee, User user, Card card, Account senderAccount) {
+        var transaction = Transaction.builder()
+                .amount(amount)
+                .txFee(txFee)
+                .status(Status.COMPLETED)
+                .type(Type.WITHDRAW)
+                .owner(user)
+                .card(card)
+                .account(senderAccount)
+                .build();
+        return  transactionRepository.save(transaction);
+    }
+
 }

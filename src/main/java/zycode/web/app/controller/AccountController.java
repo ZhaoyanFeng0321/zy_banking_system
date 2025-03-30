@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import zycode.web.app.dto.AccountDto;
 import zycode.web.app.dto.TransferDto;
 import zycode.web.app.entity.Account;
-import zycode.web.app.entity.Transaction;
 import zycode.web.app.entity.User;
 import zycode.web.app.service.AccountService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/accounts")
@@ -44,6 +44,13 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getUserAccounts(user.getUid()));
     }
 
+    /**
+     * Transfers funds from one account to another for the authenticated user.
+     *
+     * @param transferDto The details of the transfer.
+     * @param authentication The current authentication context.
+     * @return The created transaction.
+     */
     @PostMapping("/transfer")
     public ResponseEntity<?> transferAccount(@RequestBody TransferDto transferDto, Authentication authentication) {
         var user = (User) authentication.getPrincipal();
@@ -53,5 +60,26 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong, failed to make transfer.");
         }
     }
+
+    @PostMapping("/payCard")
+    public ResponseEntity<?> payCardBalance(@RequestBody TransferDto dto, Authentication authentication) {
+        var user = (User) authentication.getPrincipal();
+        try {
+            return ResponseEntity.ok(accountService.payCardBalance(dto, user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong." + e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves the current exchange rates for supported currencies.
+     *
+     * @return The map of currency codes to exchange rates.
+     */
+    @GetMapping("/rates")
+    public ResponseEntity<Map<String, Double>> getExchangeRate() {
+        return ResponseEntity.ok(accountService.getExchangeRate());
+    }
+
 
 }

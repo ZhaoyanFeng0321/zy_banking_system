@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class TransferDto {
-    private long recipientAccountNumber;
-    private double amount;
-    private String code;
-    private String receiver;
+public class CardDto {
+    private String type;
+    private double balance;
+    private double creditLine;
+    private String billingAddress;
 }
