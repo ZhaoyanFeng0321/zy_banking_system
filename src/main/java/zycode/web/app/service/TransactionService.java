@@ -51,6 +51,6 @@ public class TransactionService {
     }
 
     public List<Transaction> getUserTransactions(String uid) {
-        return transactionRepository.findByUid(uid);
+        return transactionRepository.findByOwnerUid(uid);
     }
 }

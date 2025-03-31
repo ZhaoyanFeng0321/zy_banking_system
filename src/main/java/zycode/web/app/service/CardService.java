@@ -19,7 +19,7 @@ public class CardService {
     private final TransactionService transactionService;
 
     public Card getCard(String uid) {
-        return cardRepository.findByOwnerUid(uid).orElseThrow();
+        return cardRepository.findByOwnerUid(uid).orElseThrow(() -> new UnsupportedOperationException("User does not have a card"));
     }
 
     public Card createCard(CardDto cardDto, User user) throws Exception {

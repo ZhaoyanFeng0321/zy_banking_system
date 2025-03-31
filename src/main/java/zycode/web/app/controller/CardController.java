@@ -18,9 +18,13 @@ public class CardController {
     private final CardService cardService;
 
     @GetMapping
-    public ResponseEntity<Card> getCard(Authentication authentication) {
+    public ResponseEntity<?> getCard(Authentication authentication) {
         var user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(cardService.getCard(user.getUid()));
+        try {
+            return ResponseEntity.ok(cardService.getCard(user.getUid()));
+        } catch (Exception e) {
+            return ResponseEntity.ok("User does not have a card.");
+        }
     }
 
     @PostMapping("/apply")

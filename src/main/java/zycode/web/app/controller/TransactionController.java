@@ -18,7 +18,7 @@ import java.util.List;
 public class TransactionController {
     private final TransactionService transactionService;
 
-    @GetMapping("/list")
+    @GetMapping
     public ResponseEntity<List<Transaction>> getUserTransactions(Authentication authentication) {
         var user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(transactionService.getUserTransactions(user.getUid()));
