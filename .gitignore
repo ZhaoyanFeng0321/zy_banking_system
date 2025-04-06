@@ -34,3 +34,5 @@ build/
 
 ### App log ###
 app.log
+
+/application.properties
