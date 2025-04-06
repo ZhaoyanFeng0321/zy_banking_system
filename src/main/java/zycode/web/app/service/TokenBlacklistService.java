@@ -25,7 +25,11 @@ public class TokenBlacklistService {
             Date expiration = jwtService.extractExpiration(token);
             long ttl = expiration.getTime() - System.currentTimeMillis();
 
-            // Only blacklist if token isn't already expired, avoid unnecessarily storing expired tokens
+            /*
+            * Only blacklist if token isn't already expired, avoid unnecessarily storing expired tokens
+            * entry in Redis should expire when the refresh token expires.
+            * Once the TTL is reached, Redis automatically removes the entry from memory, ensuring the blacklist doesn't grow indefinitely.
+            */
             if (ttl > 0) {
                 redisTemplate.opsForValue().set(
                         BLACKLIST_PREFIX + token,

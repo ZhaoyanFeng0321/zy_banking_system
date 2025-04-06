@@ -82,7 +82,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Logs out a user by blacklisting their tokens
+     * Logs out a user by blacklisting their accessToken and refreshToken
      */
     public void logout(String accessToken, String refreshToken) {
         // Remove "Bearer " prefix if present

@@ -1,10 +1,8 @@
 package zycode.web.app.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import zycode.web.app.dto.UserDto;
 import zycode.web.app.entity.User;
