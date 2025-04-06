@@ -1,9 +1,11 @@
-package zycode.web.app.service;
+package zycode.web.app.service.helper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import zycode.web.app.service.ExchangeRateService;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 

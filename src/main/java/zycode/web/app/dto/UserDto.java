@@ -1,9 +1,7 @@
 package zycode.web.app.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import jdk.jshell.Snippet;
+import lombok.*;
 
 import java.util.Date;
 
@@ -13,6 +11,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class UserDto {
@@ -24,4 +23,5 @@ public class UserDto {
     private long tel;
     private String password;
     private String gender;
+
 }

@@ -22,22 +22,23 @@ public class UserController {
             User user = userService.registerUser(userDto);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something wrong. Failed to register.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Something wrong. Failed to register.");
         }
     }
 
-    @PostMapping("/auth")
-    public ResponseEntity<?> authenticateUser(@RequestBody UserDto userDto) {
-        try {
-            var authObject = userService.authenticateUser(userDto);
-            var token = (String) authObject.get("token");
-            return ResponseEntity.ok()
-                    .header("Authorization", token)
-                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization")
-                    .body(authObject.get("user"));
-        } catch (AuthenticationException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something wrong. Failed to login.");
-
-        }
-    }
+//    @PostMapping("/auth")
+//    public ResponseEntity<?> authenticateUser(@RequestBody UserDto userDto) {
+//        try {
+//            var authObject = userService.authenticateUser(userDto);
+//            var token = (String) authObject.get("token");
+//            return ResponseEntity.ok()
+//                    .header("Authorization", token)
+//                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization")
+//                    .body(authObject.get("user"));
+//        } catch (AuthenticationException e){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something wrong. Failed to login.");
+//
+//        }
+//    }
 }

@@ -15,7 +15,9 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final long EXPIRATION_TIME = 86400000; // 1 day
+    //private static final long EXPIRATION_TIME = 86400000; // 1 day
+    private static final long ACCESS_TOKEN_EXPIRATION = 900000; // 15 minutes
+    private static final long REFRESH_TOKEN_EXPIRATION = 86400000; // 1 day
 
     /**
      * The secret key used to sign and verify JWT tokens.
@@ -35,21 +37,31 @@ public class JwtService {
     }
 
     /**
-     * Generates a JWT token for the given username.
+     * Generates a JWT token for the given username. support different token types (access vs refresh)
      *
      * @param username The username for which the token is generated.
+     * @param isRefreshToken True if the token is refresh token, false if is access token.
      * @return The generated JWT token.
      */
-    public String generateToken(String username) {
+    public String generateToken(String username, boolean isRefreshToken) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + EXPIRATION_TIME);
+        long expiration = isRefreshToken ? REFRESH_TOKEN_EXPIRATION : ACCESS_TOKEN_EXPIRATION;
+        Date expirationDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(now)
-                .expiration(expiration)
+                .expiration(expirationDate)
                 .signWith(generateKey())
                 .compact();
+    }
+
+    public String generateAccessToken(String username) {
+        return generateToken(username, false);
+    }
+
+    public String generateRefreshToken(String username) {
+        return generateToken(username, true);
     }
 
     /**

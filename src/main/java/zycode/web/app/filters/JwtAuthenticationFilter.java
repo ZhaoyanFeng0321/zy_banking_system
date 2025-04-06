@@ -14,11 +14,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import zycode.web.app.service.JwtService;
 import zycode.web.app.entity.User;
+import zycode.web.app.service.TokenBlacklistService;
 
 import java.io.IOException;
 
 /**
- * A filter that authenticates incoming requests using JWT tokens.
+ * A filter that authenticates every incoming requests using JWT tokens.
  * This filter is responsible for extracting the JWT token from the request header,
  * validating it, and setting up the user's authentication context.
  */
@@ -28,6 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService blacklistService;
+
 
     @Override
     protected void doFilterInternal(
@@ -35,20 +38,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        String jwtToken = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
 
-        if (jwtToken == null || !jwtService.isTokenValid(jwtToken.substring(7))) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request,response);
             return;
         }
+        final String jwtToken = authHeader.substring(7);
 
-        jwtToken = jwtToken.startsWith("Bearer ") ? jwtToken.substring(7) :jwtToken;
+        // Check if token is valid and not blacklisted
+        if (!jwtService.isTokenValid(jwtToken) || blacklistService.isBlacklisted(jwtToken)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String subject = jwtService.extractSubject(jwtToken);
         User user = (User) userDetailsService.loadUserByUsername(subject);
         SecurityContext context = SecurityContextHolder.getContext();
 
         if (user != null && context.getAuthentication() == null) {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    user, null, user.getAuthorities());
             authenticationToken.setDetails(request);
             context.setAuthentication(authenticationToken);
         }

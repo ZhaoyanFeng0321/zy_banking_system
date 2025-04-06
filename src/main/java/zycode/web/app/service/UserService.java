@@ -12,9 +12,7 @@ import zycode.web.app.dto.UserDto;
 import zycode.web.app.entity.User;
 import zycode.web.app.repository.UserRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +21,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserDetailsService userDetailsService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
 
     /**
      * Registers a new user.
@@ -36,27 +31,6 @@ public class UserService {
     public User registerUser(UserDto userDto) {
         User user = mapToUser(userDto);
         return userRepository.save(user);
-    }
-
-    /**
-     * Authenticates a user and generates a JWT token.
-     *
-     * @param userDto The user data transfer object containing the user's credentials.
-     * @return A map containing the JWT token and the authenticated user.
-     * @throws UsernameNotFoundException If the user is not found.
-     */
-    public Map<String, Object> authenticateUser(UserDto userDto) {
-        Map<String, Object> authObject = new HashMap<String, Object>();
-        User user = (User) userDetailsService.loadUserByUsername(userDto.getUsername());
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
-        authObject.put("token", "Bearer ".concat(jwtService.generateToken(userDto.getUsername())));
-        authObject.put("user", user);
-        return authObject;
     }
 
     /**
@@ -76,4 +50,27 @@ public class UserService {
                 .roles(List.of("USER"))
                 .build();
     }
+
+//    /**
+//     * Authenticates a user and generates a JWT token.
+//     *
+//     * @param userDto The user data transfer object containing the user's credentials.
+//     * @return A map containing the JWT token and the authenticated user.
+//     * @throws UsernameNotFoundException If the user is not found.
+//     */
+//    public Map<String, Object> authenticateUser(UserDto userDto) {
+//        Map<String, Object> authObject = new HashMap<String, Object>();
+//        User user = (User) userDetailsService.loadUserByUsername(userDto.getUsername());
+//        if (user == null) {
+//            throw new UsernameNotFoundException("User not found");
+//        }
+//
+//        authenticationManager
+//                .authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
+//        authObject.put("token", "Bearer ".concat(jwtService.generateToken(userDto.getUsername())));
+//        authObject.put("user", user);
+//        return authObject;
+//    }
+
+
 }
