@@ -106,4 +106,17 @@ public class JwtService {
     public Date extractExpiration(String token) {
         return extractClaims(token).getExpiration();
     }
+
+    // For testing only
+    public String generateTokenWithCustomExpiration(String username, long expirationMs) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + expirationMs);
+
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(now)
+                .expiration(expiration)
+                .signWith(generateKey())
+                .compact();
+    }
 }

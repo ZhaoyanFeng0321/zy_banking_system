@@ -26,9 +26,19 @@ cd zybank
 ### **2️⃣ Configure Database**  
 Update `application.properties` (or `application.yml`) with your PostgreSQL credentials:  
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/zybank
+spring.datasource.url=jdbc:postgresql://localhost:5432/yourdb
 spring.datasource.username=your_username
 spring.datasource.password=your_password
+
+```
+Alternative: Connect to AWS RDS
+```properties
+psql -h yourdb.abcdefg12345.us-east-1.rds.amazonaws.com -U yourusername -d yourdb -p 5432
+```
+Connect to Redis
+```properties
+brew services start redis
+redis-cli
 ```
 
 ### **3️⃣ Build & Run the Application**  
@@ -44,8 +54,8 @@ spring.datasource.password=your_password
 - **Transfer Funds:** `POST /api/v1/accounts/transfer`  
 - **View Transactions:** `GET /api/v1/accounts/{accountId}/transactions`  
 
-## **To-Do & Improvements**  
-🔹 Adding Redis for JWT token refresh and expiration   
+## **Improvements & Extension Ideas**  
+✅ Adding Redis for JWT token refresh and expiration   
 🔹 Implement Role-Based Access Control  
 🔹 Adding security to sensitive information(card#, cvv, pin...)
 ...
