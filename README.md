@@ -48,7 +48,7 @@ redis-cli
 
 ### **4️⃣ API Endpoints**  
 - **Register User:** `POST /api/v1/user/register`  
-- **Login:** `POST /api/v1/user/login`  
+- **Login:** `POST /api/v1/auth/login`  
 - **Create Account:** `POST /api/v1/accounts`  
 - **Check Balance:** `GET /api/v1/accounts/{accountId}/balance`  
 - **Transfer Funds:** `POST /api/v1/accounts/transfer`  
