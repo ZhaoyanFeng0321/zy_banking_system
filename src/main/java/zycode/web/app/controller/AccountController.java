@@ -11,6 +11,7 @@ import zycode.web.app.entity.Account;
 import zycode.web.app.entity.User;
 import zycode.web.app.service.AccountService;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,14 +29,11 @@ public class AccountController {
      * @return The created account.
      */
     @PostMapping
-    public ResponseEntity<?> createAccount(@RequestBody AccountDto accountDto, Authentication authentication) {
+    public ResponseEntity<?> createAccount(@RequestBody AccountDto accountDto, Authentication authentication) throws OperationNotSupportedException {
         var user = (User) authentication.getPrincipal();
-        try {
-            Account account = accountService.createAccount(accountDto, user);
-            return ResponseEntity.ok(account);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong, failed to create account.");
-        }
+        Account account = accountService.createAccount(accountDto, user);
+        return ResponseEntity.ok(account);
+
     }
 
     @GetMapping("/list")

@@ -7,7 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import zycode.web.app.dto.CardDto;
 import zycode.web.app.dto.TransferDto;
-import zycode.web.app.entity.Card;
 import zycode.web.app.entity.User;
 import zycode.web.app.service.CardService;
 

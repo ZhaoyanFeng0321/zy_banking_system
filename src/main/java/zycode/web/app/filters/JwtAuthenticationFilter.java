@@ -18,6 +18,8 @@ import zycode.web.app.entity.User;
 import zycode.web.app.service.TokenBlacklistService;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A filter that authenticates every incoming requests using JWT tokens.
@@ -31,6 +33,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistService blacklistService;
+
+    // Define high-security endpoints that require blacklist checking
+    private final Set<String> secureEndpoints = new HashSet<String>() {{
+        add("/api/admin");
+        add("/api/transactions/*");
+        add("/api/profile");
+        // Add other high-security endpoints as needed
+    }};
 
     @Override
     protected void doFilterInternal(
@@ -47,8 +57,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Check if token is valid and not blacklisted
-        if (!jwtService.isTokenValid(jwtToken) || blacklistService.isBlacklisted(jwtToken)) {
+        // Check if token is valid
+        if (!jwtService.isTokenValid(jwtToken)){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Determine if this is a high-security endpoint
+        String requestPath = request.getRequestURI();
+//        boolean isSecureEndpoint = secureEndpoints.stream()
+//                .anyMatch(requestPath::startsWith);
+        // Then update the matching logic in doFilterInternal:
+        boolean isSecureEndpoint = secureEndpoints.stream()
+                .anyMatch(pattern -> {
+                    if (pattern.endsWith("/*")) {
+                        // For wildcard patterns, remove the /* and check if the path starts with the prefix
+                        String prefix = pattern.substring(0, pattern.length() - 2);
+                        return requestPath.startsWith(prefix);
+                    } else {
+                        // For exact patterns, use the startsWith method
+                        return requestPath.startsWith(pattern);
+                    }
+                });
+
+        // Only check blacklist for high-security endpoints
+        if (isSecureEndpoint && blacklistService.isBlacklisted(jwtToken)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -57,12 +90,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         User user = (User) userDetailsService.loadUserByUsername(subject);
         SecurityContext context = SecurityContextHolder.getContext();
 
+        /*
+         * This creates a new authentication token with:
+         * The user object as the principal (the authenticated entity)
+         * null as the credentials (password isn't needed since JWT already verified authentication)
+         * The user's authorities/roles from user.getAuthorities()
+         * */
+
         if (user != null && context.getAuthentication() == null) {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     user, null, user.getAuthorities());
+
             authenticationToken.setDetails(request);
             context.setAuthentication(authenticationToken);
         }
+
 
         filterChain.doFilter(request, response);
     }

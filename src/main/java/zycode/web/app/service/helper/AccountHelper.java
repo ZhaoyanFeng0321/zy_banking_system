@@ -13,6 +13,7 @@ import zycode.web.app.service.TransactionService;
 import zycode.web.app.util.RandomUtil;
 
 import javax.naming.OperationNotSupportedException;
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,13 +37,10 @@ public class AccountHelper {
             "INR", "Indian Rupee"
     );
 
-    public Account createAccount(AccountDto accountDto, User user) throws Exception {
+    public Account createAccount(AccountDto accountDto, User user) throws OperationNotSupportedException {
         long accountNumber;
-        try {
-            validateAccountNonExistsForUser(accountDto.getCode(), user.getUid());
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        validateAccountNonExistsForUser(accountDto.getCode(), user.getUid());
+
         do {
             accountNumber = new RandomUtil().generateRandom(10);
         } while(accountRepository.existsByAccountNumber(accountNumber));
@@ -59,7 +57,7 @@ public class AccountHelper {
         return accountRepository.save(account);
     }
 
-    public Transaction performTransfer(Account senderAccount, Account receiverAccount, double amount, User user) throws Exception {
+    public Transaction performTransfer(Account senderAccount, Account receiverAccount, double amount, User user) throws OperationNotSupportedException {
         validateSufficientFunds(senderAccount, amount);
         senderAccount.setBalance(senderAccount.getBalance() - amount);
         receiverAccount.setBalance(receiverAccount.getBalance() + amount);
@@ -89,15 +87,15 @@ public class AccountHelper {
      *
      * @param code The currency code of the account to be validated.
      * @param uid The unique identifier of the user for whom the account is being validated.
-     * @throws Exception If an account of the given currency type already exists for the specified user.
+     * @throws OperationNotSupportedException If an account of the given currency type already exists for the specified user.
      */
-    private void validateAccountNonExistsForUser(String code, String uid) throws Exception {
+    private void validateAccountNonExistsForUser(String code, String uid) throws OperationNotSupportedException {
         if(accountRepository.existsByCodeAndOwnerUid(code, uid)) {
-            throw new Exception("Account of this type already exists for this user");
+            throw new OperationNotSupportedException("Account of this type already exists for this user");
         }
     }
 
-    public void validateSufficientFunds(Account account, double amount) throws Exception {
+    public void validateSufficientFunds(Account account, double amount) throws OperationNotSupportedException {
         if (amount <= 0) {
             throw new OperationNotSupportedException("Invalid amount to transfer");
         }

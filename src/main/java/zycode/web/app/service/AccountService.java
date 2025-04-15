@@ -11,6 +11,7 @@ import zycode.web.app.entity.User;
 import zycode.web.app.repository.AccountRepository;
 import zycode.web.app.service.helper.AccountHelper;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class AccountService {
     private final AccountHelper accountHelper;
     private final ExchangeRateService exchangeRateService;
 
-    public Account createAccount(AccountDto accountDto, User user) throws Exception {
+    public Account createAccount(AccountDto accountDto, User user) throws OperationNotSupportedException {
         return accountHelper.createAccount(accountDto, user);
     }
 

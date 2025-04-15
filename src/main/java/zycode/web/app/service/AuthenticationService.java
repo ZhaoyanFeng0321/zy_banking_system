@@ -3,6 +3,8 @@ package zycode.web.app.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import zycode.web.app.dto.authdto.AuthenticationResponse;
 import zycode.web.app.dto.authdto.RefreshTokenRequest;
 import zycode.web.app.dto.UserDto;
 import zycode.web.app.entity.User;
+import zycode.web.app.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -19,29 +22,33 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final UserRepository userRepository;
     private final TokenBlacklistService blacklistService;
 
     /**
-     * Authenticates a user and generates access and refresh tokens
+     * Authenticates a user and generates access and refresh tokens (login)
      */
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         // Authenticate with Spring Security
-        authenticationManager.authenticate(
+        Authentication authentication  = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()
                 )
         );
 
-        // Get user details
-        User user = (User) userDetailsService.loadUserByUsername(request.getUsername());
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        // 2. Extract username from authenticated principal
+        String username = authentication.getName(); // Directly get the username
 
-        // Generate tokens
-        String accessToken = jwtService.generateAccessToken(user.getUsername());
-        String refreshToken = jwtService.generateRefreshToken(user.getUsername());
+        // 3. Generate tokens using only the username (no DB fetch)
+        String accessToken = jwtService.generateAccessToken(username);
+        String refreshToken = jwtService.generateRefreshToken(username);
+
+        // 4. (Optional) Fetch user details only if needed for the response
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
 
         // Create and return response
         return AuthenticationResponse.builder()

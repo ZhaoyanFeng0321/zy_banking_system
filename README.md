@@ -57,12 +57,16 @@ redis-cli
 ## **Improvements & Extension Ideas**  
 ✅ Adding Redis for JWT token refresh and expiration \
 ✅ Sets access token & refresh token in an HttpOnly, Secure cookie\
-🔹 Speed up by:
+✅ centralized error handling\
+🔲 Redis Rate Limiting Mechanism\
+🔲 Distributed Caching Implementation\
+🔲 Retry Mechanism Implementation\
+🔲 Load Balancer Configuration:\
+🔲 Speed up by:
 1. short-live access token (no blacklist check)
 2. Refresh token revocation with Redis (only checked on refresh) 
 3. Keep JWT payloads small and verify signature in each service.
 
-🔹 Implement Role-Based Access Control\
-🔹 Implement RLS for PostgreSql/SpringBoot Filter\
-🔹 Adding security to sensitive information(card#, cvv, pin...)\
+ 🔲 Implement RLS for PostgreSql/SpringBoot Filter\
+ 🔲 Adding security to sensitive information(card#, cvv, pin...)\
 ...
